@@ -80,11 +80,14 @@ curl http://localhost:3000/health
 MAX_MODE=webhook
 MAX_WEBHOOK_URL=https://your-domain.ru/webhook
 MAX_WEBHOOK_SECRET=случайная_строка_минимум_16_символов
+AUTO_REGISTER_WEBHOOK=true
 ```
 
 Допустимые символы секрета MAX: латинские буквы, цифры, `_` и `-`.
 
-4. Перезапустите приложение и зарегистрируйте webhook:
+4. Перезапустите приложение. При `AUTO_REGISTER_WEBHOOK=true` оно зарегистрирует webhook после открытия HTTP-порта. После успешного запуска верните переменную в `false`, чтобы повторные рестарты не создавали лишние подписки.
+
+Или зарегистрируйте webhook вручную:
 
 ```bash
 docker compose exec app npm run max:subscribe

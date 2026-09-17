@@ -91,12 +91,21 @@ async function bootstrap(): Promise<void> {
     }
   });
 
-  const server = app.listen(env.PORT, () => {
-    logger.info(
-      { port: env.PORT, maxMode: env.MAX_MODE, sources: sourceRegistry.list() },
-      "PriceHunter запущен",
-    );
+  const server = await new Promise<ReturnType<typeof app.listen>>((resolve, reject) => {
+    const candidate = app.listen(env.PORT, () => {
+      logger.info(
+        { port: env.PORT, maxMode: env.MAX_MODE, sources: sourceRegistry.list() },
+        "PriceHunter запущен",
+      );
+      resolve(candidate);
+    });
+    candidate.once("error", reject);
   });
+
+  if (env.AUTO_REGISTER_WEBHOOK && env.MAX_MODE === "webhook") {
+    await client.subscribeWebhook(env.MAX_WEBHOOK_URL!, env.MAX_WEBHOOK_SECRET);
+    logger.info("Webhook MAX зарегистрирован автоматически");
+  }
 
   const poller = env.MAX_MODE === "polling" ? new MaxPoller(client, router) : null;
   if (poller) void poller.start();

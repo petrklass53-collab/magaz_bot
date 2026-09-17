@@ -42,6 +42,7 @@ const envSchema = z.object({
   MAX_MODE: z.enum(["webhook", "polling"]).default("webhook"),
   MAX_WEBHOOK_URL: z.string().url().optional(),
   MAX_WEBHOOK_SECRET: z.string().min(5).max(256).regex(/^[a-zA-Z0-9_-]+$/).optional(),
+  AUTO_REGISTER_WEBHOOK: booleanFromString.default("false"),
   TRIAL_DAYS: z.coerce.number().int().min(1).max(365).default(30),
   ALERT_CHECK_INTERVAL_MS: z.coerce.number().int().min(10_000).default(900_000),
   SOURCE_TIMEOUT_MS: z.coerce.number().int().min(500).max(60_000).default(5_000),
