@@ -17,6 +17,7 @@ export class OfferRepository {
         title: offer.title,
         price: offer.price,
         deliveryPrice: offer.deliveryPrice,
+        deliveryKnown: offer.deliveryKnown,
         mandatoryFees: offer.mandatoryFees ?? 0,
         totalPrice: offer.totalPrice,
         currency: offer.currency,
@@ -29,6 +30,7 @@ export class OfferRepository {
         title: offer.title,
         price: offer.price,
         deliveryPrice: offer.deliveryPrice,
+        deliveryKnown: offer.deliveryKnown,
         mandatoryFees: offer.mandatoryFees ?? 0,
         totalPrice: offer.totalPrice,
         currency: offer.currency,
@@ -40,6 +42,7 @@ export class OfferRepository {
       !previous ||
       previous.price !== saved.price ||
       previous.deliveryPrice !== saved.deliveryPrice ||
+      previous.deliveryKnown !== saved.deliveryKnown ||
       previous.mandatoryFees !== saved.mandatoryFees ||
       previous.totalPrice !== saved.totalPrice;
 
@@ -49,6 +52,7 @@ export class OfferRepository {
           offerId: saved.id,
           price: saved.price,
           deliveryPrice: saved.deliveryPrice,
+          deliveryKnown: saved.deliveryKnown,
           mandatoryFees: saved.mandatoryFees,
           totalPrice: saved.totalPrice,
         },
@@ -61,7 +65,7 @@ export class OfferRepository {
   async currentForProduct(productId: string): Promise<DbOffer[]> {
     return prisma.offer.findMany({
       where: { productId, availability: { not: "out_of_stock" } },
-      orderBy: { totalPrice: "asc" },
+      orderBy: [{ deliveryKnown: "desc" }, { totalPrice: "asc" }],
     });
   }
 }

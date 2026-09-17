@@ -66,6 +66,7 @@ model Offer {
   title          String
   price          Int
   deliveryPrice  Int            @default(0)
+  deliveryKnown  Boolean        @default(true)
   mandatoryFees  Int            @default(0)
   totalPrice     Int
   currency       String         @default("RUB")
@@ -84,6 +85,7 @@ model PriceHistory {
   offer         Offer    @relation(fields: [offerId], references: [id], onDelete: Cascade)
   price         Int
   deliveryPrice Int      @default(0)
+  deliveryKnown Boolean  @default(true)
   mandatoryFees Int      @default(0)
   totalPrice    Int
   recordedAt    DateTime @default(now())

@@ -16,7 +16,17 @@ export class FavoriteRepository {
   async forUser(userId: string) {
     return prisma.favorite.findMany({
       where: { userId },
-      include: { product: { include: { offers: { orderBy: { totalPrice: "asc" }, take: 1 } } } },
+      include: {
+        product: {
+          include: {
+            offers: {
+              where: { deliveryKnown: true, availability: { not: "out_of_stock" } },
+              orderBy: { totalPrice: "asc" },
+              take: 1,
+            },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
   }

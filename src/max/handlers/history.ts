@@ -1,4 +1,5 @@
 import type { User } from "@prisma/client";
+import { priceSparkline } from "../../core/history.service.js";
 import { HistoryRepository } from "../../db/repositories/history.repository.js";
 import { ProductRepository } from "../../db/repositories/product.repository.js";
 import { UserFacingError } from "../../utils/errors.js";
@@ -27,6 +28,10 @@ export class HistoryHandler {
     if (!product) throw new UserFacingError("Товар не найден.");
     const stats = await this.history.statsForProduct(productId);
     const value = (price: number | null) => (price === null ? "нет данных" : formatRubles(price));
+    const trend = priceSparkline(stats.dailyMinimums.map((point) => point.totalPrice));
+    const period = stats.dailyMinimums.length
+      ? `${stats.dailyMinimums[0]!.day.toLocaleDateString("ru-RU", { timeZone: "UTC" })} — ${stats.dailyMinimums.at(-1)!.day.toLocaleDateString("ru-RU", { timeZone: "UTC" })}`
+      : null;
     await this.client.sendMessage(
       user.maxUserId.toString(),
       [
@@ -36,6 +41,9 @@ export class HistoryHandler {
         `Минимум: ${value(stats.minimum)}`,
         `Максимум: ${value(stats.maximum)}`,
         `Зафиксировано изменений: ${stats.points}`,
+        ...(trend ? [`Динамика дневных минимумов: ${trend}`, `Период: ${period}`] : []),
+        "",
+        "В статистике учитываются только предложения с указанной доставкой.",
       ].join("\n"),
       backToMenuKeyboard(),
     );
