@@ -183,6 +183,7 @@ src/
 - Не добавляйте `.env` и токены в Git.
 - В production обязательно установите собственные `POSTGRES_PASSWORD` и `MAX_WEBHOOK_SECRET`.
 - Webhook с настроенным секретом отклоняет запросы без верного `X-Max-Bot-Api-Secret`.
+- Контейнер доверяет явно добавленному `Russian Trusted Root CA`, необходимому для TLS MAX API; проверка TLS не отключается.
 - Пользовательский ввод ограничен и валидируется.
 - URL кнопок допускают только `http`/`https`.
 - Pino скрывает Authorization и токены из логов.
