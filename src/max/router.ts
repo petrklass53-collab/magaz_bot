@@ -107,7 +107,14 @@ export class MaxRouter {
   private async handleCallback(update: MaxUpdate, user: User): Promise<void> {
     const callback = update.callback;
     if (!callback) throw new UserFacingError("Некорректное нажатие кнопки.");
-    await this.client.answerCallback(callback.callback_id);
+    // A callback acknowledgement improves the MAX client UX, but a rejected or
+    // expired acknowledgement must not prevent the requested bot action.
+    await this.client.answerCallback(callback.callback_id).catch((error) => {
+      logger.warn(
+        { callbackId: callback.callback_id, error: errorMessage(error) },
+        "Не удалось подтвердить callback MAX; действие продолжается",
+      );
+    });
     const payload = callback.payload ?? "";
 
     if (payload === "menu:home") return this.handlers.start.menu(user);

@@ -32,7 +32,14 @@ export class MaxClient {
   }
 
   async answerCallback(callbackId: string): Promise<void> {
-    await this.request({ method: "POST", url: "/answers", params: { callback_id: callbackId }, data: {} });
+    // MAX documents `message` as nullable. Sending the field explicitly avoids
+    // a 400 response from the production API when the body is an empty object.
+    await this.request({
+      method: "POST",
+      url: "/answers",
+      params: { callback_id: callbackId },
+      data: { message: null },
+    });
   }
 
   async getUpdates(marker?: string | number | null): Promise<MaxUpdatesResponse> {
@@ -94,7 +101,19 @@ export class MaxClient {
         await sleep(delay);
         return this.request<T>(config, attempt + 1);
       }
-      logger.error({ status, method: config.method, url: config.url }, "Ошибка MAX API");
+      const responseData = axiosError.response?.data;
+      const apiCode =
+        responseData && typeof responseData === "object" && "code" in responseData
+          ? String(responseData.code)
+          : undefined;
+      const apiMessage =
+        responseData && typeof responseData === "object" && "message" in responseData
+          ? String(responseData.message).slice(0, 500)
+          : undefined;
+      logger.error(
+        { status, method: config.method, url: config.url, apiCode, apiMessage },
+        "Ошибка MAX API",
+      );
       throw error;
     }
   }
