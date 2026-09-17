@@ -1,0 +1,44 @@
+{
+  "name": "pricehunter-max-bot",
+  "version": "0.2.1",
+  "private": true,
+  "description": "PriceHunter — MAX bot for comparing final product prices",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/src/main.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "prisma generate",
+    "db:migrate": "tsx scripts/deploy-migrations.ts",
+    "db:deploy": "node dist/scripts/deploy-migrations.js",
+    "db:studio": "prisma studio",
+    "max:subscribe": "node dist/scripts/subscribe-webhook.js",
+    "max:subscribe:dev": "tsx scripts/subscribe-webhook.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "6.12.0",
+    "axios": "1.20.0",
+    "dotenv": "17.2.2",
+    "express": "5.1.0",
+    "express-rate-limit": "8.7.0",
+    "fast-xml-parser": "^5.11.1",
+    "pg": "8.23.0",
+    "pino": "9.9.5",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.3",
+    "@types/node": "24.5.2",
+    "@types/pg": "8.23.1",
+    "pino-pretty": "13.1.1",
+    "prisma": "6.12.0",
+    "tsx": "4.20.5",
+    "typescript": "5.9.2",
+    "vitest": "5.0.1"
+  }
+}

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
+  <title id="title">PriceHunter MAX</title>
+  <desc id="description">Синий ценник в фиолетовом прицеле на тёмном фоне</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07101f"/>
+      <stop offset="1" stop-color="#160c35"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#36b8ff"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="210" fill="url(#bg)"/>
+  <circle cx="512" cy="430" r="245" fill="none" stroke="#27385b" stroke-width="22"/>
+  <circle cx="512" cy="430" r="178" fill="none" stroke="url(#accent)" stroke-width="18" filter="url(#glow)"/>
+  <path d="M512 120v126M512 614v126M202 430h126M696 430h126" stroke="#51b9ff" stroke-width="22" stroke-linecap="round"/>
+  <path d="M404 320h190l92 92-190 190-156-156V320h64Z" fill="url(#accent)" filter="url(#glow)"/>
+  <circle cx="405" cy="383" r="24" fill="#eaf7ff"/>
+  <path d="M500 372c-36 0-64 18-64 46 0 31 26 40 68 49 22 5 30 10 30 19 0 10-13 17-34 17-25 0-45-8-63-22l-24 34c20 17 45 27 72 31v37h40v-37c38-7 63-30 63-62 0-35-27-46-70-55-20-4-28-9-28-17 0-9 10-15 28-15 21 0 39 6 55 17l22-35c-18-13-39-21-62-25v-34h-40v35Z" fill="#07101f"/>
+  <text x="512" y="825" text-anchor="middle" fill="#f4f7ff" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="700" letter-spacing="-3">PriceHunter</text>
+  <rect x="427" y="866" width="170" height="70" rx="35" fill="#5a67ff"/>
+  <text x="512" y="916" text-anchor="middle" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700">MAX</text>
+</svg>

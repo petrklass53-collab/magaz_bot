@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  EXPIRED
+  CANCELED
+}
+
+enum UserState {
+  IDLE
+  WAITING_FOR_SEARCH
+  WAITING_FOR_TARGET_PRICE
+  WAITING_FOR_CITY
+}
+
+model User {
+  id                 String             @id @default(cuid())
+  maxUserId          BigInt             @unique
+  username           String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  trialUntil         DateTime
+  subscriptionUntil  DateTime?
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  city               String?
+  state              UserState          @default(IDLE)
+  stateData          Json?
+  searches           Search[]
+  alerts             PriceAlert[]
+  favorites          Favorite[]
+}
+
+model Product {
+  id             String         @id @default(cuid())
+  brand          String
+  model          String
+  category       String
+  variant        String?
+  storage        String?
+  color          String?
+  normalizedName String         @unique
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  offers         Offer[]
+  alerts         PriceAlert[]
+  favorites      Favorite[]
+
+  @@index([brand, model])
+  @@index([category])
+}
+
+model Offer {
+  id             String         @id @default(cuid())
+  productId      String
+  product        Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  source         String
+  seller         String
+  title          String
+  price          Int
+  deliveryPrice  Int            @default(0)
+  mandatoryFees  Int            @default(0)
+  totalPrice     Int
+  currency       String         @default("RUB")
+  availability   String
+  url            String
+  updatedAt      DateTime       @updatedAt
+  priceHistory   PriceHistory[]
+
+  @@unique([source, url])
+  @@index([productId, totalPrice])
+}
+
+model PriceHistory {
+  id            String   @id @default(cuid())
+  offerId       String
+  offer         Offer    @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  price         Int
+  deliveryPrice Int      @default(0)
+  mandatoryFees Int      @default(0)
+  totalPrice    Int
+  recordedAt    DateTime @default(now())
+
+  @@index([offerId, recordedAt])
+}
+
+model PriceAlert {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId             String
+  product               Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  targetPrice           Int
+  active                Boolean  @default(true)
+  lastNotifiedPrice     Int?
+  lastNotifiedAt        DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([active, updatedAt])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId, createdAt])
+}
+
+model Search {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query     String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model ProcessedUpdate {
+  id          String   @id
+  processedAt DateTime @default(now())
+
+  @@index([processedAt])
+}

@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pricehunter
+      POSTGRES_USER: pricehunter
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+    volumes:
+      - pricehunter_postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pricehunter -d pricehunter"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://pricehunter:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/pricehunter?schema=public
+      MAX_BOT_TOKEN: ${MAX_BOT_TOKEN}
+      MAX_API_BASE_URL: ${MAX_API_BASE_URL:-https://platform-api2.max.ru}
+      MAX_MODE: ${MAX_MODE:-webhook}
+      MAX_WEBHOOK_URL: ${MAX_WEBHOOK_URL:-https://your-domain.example/webhook}
+      MAX_WEBHOOK_SECRET: ${MAX_WEBHOOK_SECRET:-replace_with_random_secret_at_least_16_chars}
+      TRIAL_DAYS: ${TRIAL_DAYS:-30}
+      ALERT_CHECK_INTERVAL_MS: ${ALERT_CHECK_INTERVAL_MS:-900000}
+      SOURCE_TIMEOUT_MS: ${SOURCE_TIMEOUT_MS:-5000}
+      ENABLE_DEMO_SOURCE: ${ENABLE_DEMO_SOURCE:-true}
+      YML_FEEDS_JSON: ${YML_FEEDS_JSON:-[]}
+      YML_FEED_CACHE_TTL_MS: ${YML_FEED_CACHE_TTL_MS:-300000}
+      YML_FEED_MAX_BYTES: ${YML_FEED_MAX_BYTES:-25000000}
+      YML_SOURCE_MAX_OFFERS: ${YML_SOURCE_MAX_OFFERS:-200}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      RUN_WORKER: ${RUN_WORKER:-true}
+    ports:
+      - "3000:3000"
+
+volumes:
+  pricehunter_postgres:
